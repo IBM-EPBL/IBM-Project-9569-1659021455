@@ -20,15 +20,24 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.min.css"
     />
+    <style>
+      #header {
+        height: 100vh;
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("../static/images/1.jpg");
+        background-position: center;
+        background-size: cover;
+        background-attachment: fixed;
+      }
+    </style>
   </head>
 
   <body>
     <!--------------Header Section-------------->
     <section id="header">
       <div class="container text-center">
-        <button type="button" class="button1">Logout</button>
+        <a href="/"><button type="button" class="button1">Logout</button></a>
         <div class="user-box">
-          <img src="images/1.jpg" />
+          <img src="../static/images/1.jpg" />
           <h1>WELCOME TO PETA</h1>
           <p>Personel Expense Tracker</p>
         </div>

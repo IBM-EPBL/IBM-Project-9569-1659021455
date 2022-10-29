@@ -1,4 +1,4 @@
-from curses import flash
+# from curses import flash
 from flask import Flask, render_template, request
 from flask_restful import Api, Resource, reqparse, abort
 
@@ -52,7 +52,7 @@ def addAccount():
     ibm_db.bind_param(prep_stmt, 5, 1)
     ibm_db.execute(prep_stmt)
     
-    flash( "Account Data saved successfuly..")
+    print( "Account Data saved successfuly..")
     return render_template('index.html')
 
 @app.route('/loginAccount',methods = ['POST', 'GET'])
@@ -78,9 +78,9 @@ def loginAccount():
         account = ibm_db.fetch_assoc(stmt)
     
     if check == 1:
-        flash( "Login successfull..")
+        print( "Login successfull..")
         return render_template('homepage.html')
-    flash( "Login failed..")
+    print( "Login failed..")
 
 def abort_if_account_id_doesnt_exist(account_id):
     if account_id not in Accounts:
