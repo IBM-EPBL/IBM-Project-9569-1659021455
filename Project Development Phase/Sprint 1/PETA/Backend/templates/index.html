@@ -3,12 +3,27 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PETA</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/style.css')}}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        .user {
+            display: -webkit-box;
+            display: flex;
+            -webkit-box-pack: center;
+            justify-content: center;
+            -webkit-box-align: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background: url("../static/images/1.jpg") no-repeat center;
+            background-size: cover;
+        }
+    </style>
 </head>
+
 
 <body>
 
@@ -74,7 +89,7 @@
             </div>
         </div>
     </section>
-    <script src="js.js"></script>
+    <script src="{{url_for('static', filename='js/js.js')}}"></script>
 
     <!-- ----------Smooth Scroll-------------   
     <script src="smooth-scroll.js"></script>
