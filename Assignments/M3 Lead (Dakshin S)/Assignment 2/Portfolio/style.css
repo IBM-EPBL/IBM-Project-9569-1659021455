@@ -1,0 +1,191 @@
+
+canvas {
+    background: #EEE;
+    position:fixed;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+  }
+#MainView{
+    padding: 10% 5% 5% 5%;
+}
+.MainText{
+    margin: 0% 0% 0% 40%;
+    font-weight: 600;
+}
+.MainHeading{
+    font-size: 70px;
+}
+.btn-primary{
+   background-color: blueviolet;
+   color: blueviolet;
+}
+.buttons{
+    padding: 10% 0% 10% 0%;
+    margin-left: 40%;
+}
+.subText{
+    opacity: 0.5;
+}
+.lottieView{
+    margin: 0 0 0 25%;
+}
+.lottie{
+    padding: 0 0 0 0;
+    margin: auto auto auto auto;
+}
+#MidView{
+    padding: 5% 11% 5% 11%;
+    text-align: center;
+}
+.MidViewDesign{
+    background-color: #F4EEFF;
+    padding: 0% 0% 0% 0%;
+}
+.midText{
+    padding: 7% 5% 0% 7%;
+    padding-bottom: 0ch;
+    margin-left: 100px;
+}
+.HeadingText{
+    padding: 7% 2% 0% 0%;
+    margin: auto 10%;
+    font-size: 35px;
+}
+.programImage{
+    margin-left: auto auto auto 10%;
+}
+#MidOneView{
+    padding: 5% 30% 5% 3%;
+
+}
+.MidOneView{
+    background-color: #EFF8FF;
+}
+.codeView{
+    padding: 2% 20% 0 0%;
+    margin: auto 20% auto 20%;
+}
+#MidTwoView{
+    padding: 5% 3% 5% 30%;
+}
+.MidTwoView{
+    background-color: #F4EEFF;
+}
+.appProjects{
+    background-color: #F0D9FF;
+    padding: 5% 3% 5% 3%;
+}
+.appProjects-1{
+    background-color: #FFBCBC;
+    padding: 5% 3% 5% 3%;
+}
+#testSection{
+    background-color: #D3E0DC;
+}
+lottie-player{
+    margin: 0 auto;
+}
+.J{
+    padding: 0% 0% 3% 0%;
+    text-align: center;
+    font-size: 30PX;
+}
+.project1{
+    background-image: url("../Images/wave-2.png");
+    margin: 10% 25% 3% 30%;
+    background-color: #FFE3FE;
+}
+.project2{
+    background-image: url("../Images/wave-2.png");
+    margin: 10% 25% 3% 30%;
+    background-color: #FFE3FE;
+}
+.project3{
+    background-image: url("../Images/wave-2.png");
+    margin: 10% 25% 3% 30%;
+    background-color: #FFE3FE;
+    
+}
+.ProjectButton{
+    margin: auto auto 5% auto;
+}
+#WelcomeSection{
+    background: linear-gradient(45deg, #C7F5FE 10%, #C7F5FE 40%, #FCC8F8 40%, #FCC8F8 60%, #EAB4F8 60%, #EAB4F8 65%, #F3F798 65%, #F3F798 90%);
+    background-color: #F8EDED;
+    margin: 10% 10% 10% 10%;
+}
+#app{
+    background: linear-gradient(45deg, #C7F5FE 10%, #C7F5FE 40%, #FCC8F8 40%, #FCC8F8 60%, #EAB4F8 60%, #EAB4F8 65%, #F3F798 65%, #F3F798 90%);
+    background-color: #F8EDED;
+}
+.LastSection{
+    background-image: url("../Images/wave-2.png");
+    background-color: #FFE3FE;
+    text-align: center;
+}
+.resumeButton{
+    margin: auto auto 5% auto;
+}
+.appText{
+    margin: 2% 10% 10% 10%;
+    background: rgba( 255, 255, 255, 0 );
+box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
+backdrop-filter: blur( 4px );
+-webkit-backdrop-filter: blur( 4px );
+border-radius: 10px;
+border: 1px solid rgba( 255, 255, 255, 0.18 );
+animation: backwards;
+}
+.AppHeading{
+    text-align: center;
+    padding: 2% 0% 2% 0%;
+    font-weight: bolder;
+}
+#other{
+    margin: 10% 10% 10% 10%;
+}
+#ConnectSection{
+    text-align: center;
+    margin: 10% 20% 10% 20%;
+}
+.SocialIcon{
+    padding-top: 10%;
+    text-align: center;
+    margin: auto;
+}
+.fab{
+    padding: 0% 2% 0% 2%;
+}
+.pText{
+    opacity: 0.5;
+    padding: 5% 0% 5% 2%
+}
+.ProjectTitle{
+    text-align: center;
+    font-size: 100px;
+    padding: 5% 0% 0% 0%;
+}
+.appSubtext{
+    opacity: 0.5;
+}
+.EndText{
+    margin: auto;
+    font-size: 30px;
+}
+/* */
+.lastSubText{
+    margin: auto;
+    opacity: 0.5;
+}
+.Text{
+    font-weight: bold;
+    padding: 1% 1% 0% 1%;
+}
+.SourceCodeButton{
+    margin: 2% 5% 2% 20%;
+}
+.LiveButton{
+    margin: 2% 2% 2% 5% ;
+}
