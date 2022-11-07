@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login Page</title>
+    <link href="include/image/favicon.png" rel="icon">
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='styles/style.css')}}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{url_for('static', filename='styles/bootstrap.min.css')}}"
+    />
+    <style>
+        .card-img-left {
+            width: 40%;
+            background: scroll center url('../static/image/background.webp');
+            background-size: cover;
+        }
+    </style>
+    <!-- <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="bootstrap.min.css"> -->
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 col-xl-9 mx-auto">
+                <div class="card flex-row my-5 border-0 shadow rounded-3 overflow-hidden center">
+                    <div class="card-img-left d-none d-md-flex">
+                    </div>
+
+                    <div class="card-body p-2 p-sm-3">
+                        <h5 class="card-title text-center mb-2 fw-light h2 fw-bold">LOGIN</h5>
+                        <br />
+                        <form action="/login" method="POST">
+
+                            <div class="form-floating mb-3">
+                                <input type="email" name="log_email" class="form-control" id="floatingInputEmail"
+                                    placeholder="name@example.com">
+                                <label for="floatingInputEmail">Email address</label>
+                            </div>
+
+
+                            <div class="form-floating mb-3">
+                                <input type="password" name="log_password" class="form-control" id="floatingPassword"
+                                    placeholder="Password">
+                                <label for="floatingPassword">Password</label>
+                            </div>
+
+                            <div class="form-floating mb-3">
+                                <input type="password" name="log_cnf_password" class="form-control" id="floatingPasswordConfirm"
+                                    placeholder="Confirm Password">
+                                <label for="floatingPasswordConfirm">Confirm Password</label>
+                            </div>
+
+                            <div class="d-grid mb-2">
+                                <button class="btn btn-lg btn-primary btn-login fw-bold text-uppercase"
+                                    type="submit">Login</button>
+                            </div>
+
+                            <a class="d-block text-center mt-2 small"
+                                href="./signup">Haven't account?
+                                Sign up</a>
+                            <br />
+                            <hr class="my-2">
+                            <br />
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="include/js/font-awesome-free-5.14.0.js"></script>
+</body>
+
+</html>
+<!-- <!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <title> login </title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <div class="container">
+        <form action="#">
+            <div class="title">Login</div>
+            <div class="input-box underline">
+                <input type="text" placeholder="Enter Your Email">
+                <div class="underline"></div>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Enter Your Password">
+                <div class="underline"></div>
+            </div>
+        </form>
+        <div class="input-box button">
+            <a href="/signup.html">
+                <input type="submit" name="" value="Continue"></a>
+        </div>
+        <div class="option">or</div>
+        <div class="input-box button">
+            <input type="submit" name="" value="Signup">
+        </div>
+        </form>
+    </div>
+</body>
+<html>
+
+<body>
+    <a href="http://programminghead.com">
+        <button>Click ME</button>
+    </a>
+</body>
+
+</html> -->
