@@ -2,15 +2,13 @@
 from flask import Flask, render_template, request
 from flask_restful import Api, Resource, reqparse, abort
 import os
-from dotenv import load_dotenv
 
 import ibm_db
 
 app = Flask(__name__)
 api = Api(app)
 
-load_dotenv()
-conn = ibm_db.connect(os.getenv('CLOUD_CRED'),'','')
+conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31198;SECURITY=SSL;SSLServerCertificate=DigiCertGlobalRootCA.crt;UID=wsk70349;PWD=iVNcAyUqR4Py2Aw0",'','')
 
 account_put_args = reqparse.RequestParser()
 account_put_args.add_argument("name", type=str, help="Name of the Account is required", required=True)
