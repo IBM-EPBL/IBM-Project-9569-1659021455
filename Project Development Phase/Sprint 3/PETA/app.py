@@ -3,13 +3,32 @@ from flask import Flask, render_template, request
 from flask_restful import Api, Resource, reqparse, abort
 from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
+from flask_db2 import DB2
 
 import ibm_db
 
 app = Flask(__name__)
 api = Api(app)
 
-conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31198;SECURITY=SSL;SSLServerCertificate=DigiCertGlobalRootCA.crt;UID=wsk70349;PWD=iVNcAyUqR4Py2Aw0",'','')
+app.config['database'] = 'bludb'
+app.config['hostname'] = '0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud'
+app.config['port'] = '31198'
+app.config['protocol'] = 'tcpip'
+app.config['uid'] = 'wsk70349'
+app.config['pwd'] = 'iVNcAyUqR4Py2Aw0'
+app.config['security'] = 'SSL'
+try:
+    mysql = DB2(app)
+
+    conn_str='database=bludb;hostname=0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;port=31198;protocol=tcpip;\
+            uid=wsk70349;pwd=iVNcAyUqR4Py2Aw0;security=SSL'
+    conn = ibm_db.connect(conn_str,'','')
+        
+    print("Database connection successfull !!")
+except:
+    print("IBM DB Connection error   :     " + DB2.conn_errormsg())   
+
+# conn = ibm_db.connect("DATABASE=bludb;HOSTNAME=0c77d6f2-5da9-48a9-81f8-86b520b87518.bs2io90l08kqb1od8lcg.databases.appdomain.cloud;PORT=31198;SECURITY=SSL;SSLServerCertificate=DigiCertGlobalRootCA.crt;UID=wsk70349;PWD=iVNcAyUqR4Py2Aw0",'','')
 
 account_put_args = reqparse.RequestParser()
 account_put_args.add_argument("name", type=str, help="Name of the Account is required", required=True)
@@ -22,6 +41,20 @@ Accounts = {}
 
 @app.route('/')
 def home():
+    print("Yes")
+    # message = Mail(
+    #     from_email='useremail@gmail.com',
+    #     to_emails='care.team.peta@gmail.com',
+    #     subject='Over expenditure alert!',
+    #     html_content = 'You have exceeded your expenditure limit')
+    # try:
+    #     sg = SendGridAPIClient('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')
+    #     response = sg.send(message)
+    #     print(response.status_code)
+    #     print(response.body)
+    #     print(response.headers)
+    # except Exception as e:
+    #     print(e.message)
     return render_template('index.html')
 
 # ---------------------------------- SIGN UP --------------------------------
@@ -104,9 +137,13 @@ def loginAccount():
 
 @app.route('/dashboard',methods = ['POST', 'GET'])
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('dashboard_main.html')
 
 # ---------------------------------- FINANCIAL ACCOUNTS ----------------------------------
+
+@app.route('/manageAccounts',methods = ['POST', 'GET'])
+def manageAccounts():
+    return render_template('basic-table.html')
 
 @app.route('/addFinancialAccount',methods = ['POST', 'GET'])
 def addFinancialAccount():
@@ -188,6 +225,10 @@ def deleteFinancialAccount():
     return "Financial Account removed successfully!";
 
 # ---------------------------------- EXPENSES ----------------------------------
+
+@app.route('/manageTransactions',methods = ['POST', 'GET'])
+def manageTransactions():
+    return render_template('basic-table2.html')
 
 @app.route('/addExpenses',methods = ['POST', 'GET'])
 def addExpenses():
@@ -280,8 +321,8 @@ def addExpenses():
             today = date.today()
             today = today.strftime("%d-%m-%Y")
 
-            insert_sql_notif = "INSERT INTO notifications VALUES (?,?,?,?,?,?)"
             # notif_id user_id heading body_text date is_active
+            insert_sql_notif = "INSERT INTO notifications VALUES (?,?,?,?,?,?)"
             prep_stmt_notif = ibm_db.prepare(conn, insert_sql_notif)
             ibm_db.bind_param(prep_stmt_notif, 1, notif_id)
             ibm_db.bind_param(prep_stmt_notif, 2, user_id)
@@ -460,6 +501,7 @@ def deleteExpense():
 # ---------------------------------- CONFIGURATIONS ----------------------------------
 
 def insertConfigurations(user_id, conf_type, conf_name, amount, date):
+    # conf_id user_id conf_type conf_name amount added_date is_active
 
     sql = "SELECT * FROM configurations order by conf_id desc limit 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -492,32 +534,7 @@ def addConfiguration():
     conf_name = request.form['add_conf_name']
     amount = request.form['add_conf_amount']
     date = request.form['add_conf_date']
-    # conf_id user_id conf_type conf_name amount added_date is_active
-
-    sql = "SELECT * FROM configurations order by conf_id desc limit 1"
-    stmt = ibm_db.prepare(conn, sql)
-    ibm_db.execute(stmt)
-    configuration = ibm_db.fetch_assoc(stmt)
-    
-    id = 0
-    while configuration != False:
-        id = configuration.get("conf_id")
-        configuration = ibm_db.fetch_assoc(stmt)
-    id = id + 1
-
-    insert_sql = "INSERT INTO configurations VALUES (?,?,?,?,?,?,?)"
-    prep_stmt = ibm_db.prepare(conn, insert_sql)
-    ibm_db.bind_param(prep_stmt, 1, id)
-    ibm_db.bind_param(prep_stmt, 2, user_id)
-    ibm_db.bind_param(prep_stmt, 3, conf_type)
-    ibm_db.bind_param(prep_stmt, 4, conf_name)
-    ibm_db.bind_param(prep_stmt, 5, amount)
-    ibm_db.bind_param(prep_stmt, 6, date)
-    ibm_db.bind_param(prep_stmt, 7, 1)
-    ibm_db.execute(prep_stmt)
-    
-    print( "Configuration Data saved successfuly..")
-    # return render_template('manageExpenses.html')
+    insertConfigurations(user_id, conf_type, conf_name, amount, date)
     return render_template('index.html')
 
 @app.route('/fetchConfigurations',methods = ['POST', 'GET'])
@@ -757,4 +774,4 @@ class Account(Resource):
 api.add_resource(Account, "/account/<int:account_id>")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)
