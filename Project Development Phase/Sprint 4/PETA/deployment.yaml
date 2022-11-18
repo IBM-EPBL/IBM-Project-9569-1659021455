@@ -1,0 +1,20 @@
+ apiVersion: apps/v1
+ kind: Deployment
+ metadata:
+   name: peta-application
+ spec:
+   replicas: 1
+   selector:
+     matchLabels:
+       app: peta-application
+   template:
+     metadata:
+       labels:
+         app: peta-application
+     spec:
+       containers:
+       - name: peta-application
+         image: de.icr.io/peta-application-1/app:latest
+         imagePullPolicy: Always
+         ports:
+         - containerPort: 5000
