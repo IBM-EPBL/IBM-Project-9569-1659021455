@@ -20,81 +20,127 @@
   <link rel="stylesheet" href="{{url_for('static', filename='styles/style-1.css')}}">
   <!-- endinject -->
   <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.png')}}" />
+
+  <script>
+    async function loadData() {
+      const response_notif = await fetch('/viewNotifications', {
+        method: 'POST',
+        body: '{"view_notification_user_id":"{{ user_id }}"}', // string or object
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      let notif_html_code = "";
+      const datas_notif = await response_notif.json(); //extract JSON from the http response
+      datas_notif.forEach(element => {
+        notif_html_code += `<a class="dropdown-item py-3">`;
+        notif_html_code += `<H6><b>` + element.HEADING + `</b> - </H6>`;
+        notif_html_code += `<H6>` + element.BODY_TEXT + `</H6>`;
+        notif_html_code += `</a>`;
+      });
+      document.getElementById("notifDropDown").innerHTML = notif_html_code;
+      const response = await fetch('/viewFinancialAccount', {
+        method: 'POST',
+        body: '{"view_financial_account_user_id":"{{ user_id }}"}', // string or object
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const datas = await response.json(); //extract JSON from the http response
+      var table = document.getElementById("storeList").getElementsByTagName('tbody')[0];
+      datas.forEach(data => {
+        var newRow = table.insertRow(table.length);
+        cell1 = newRow.insertCell(0);
+        cell1.innerHTML = data.ACC_ID;
+        cell2 = newRow.insertCell(1);
+        cell2.innerHTML = data.HOLDERS_NAME;
+        cell3 = newRow.insertCell(2);
+        cell3.innerHTML = data.ACCOUNT_NO;
+        cell4 = newRow.insertCell(3);
+        cell4.innerHTML =
+          `<button onClick="onDelete(this)">Delete</button>`;
+      });
+    }
+  </script>
+
   <style>
     .performance-overview-carousel .carousel-inner .item .icon.icon-a::before {
-    content: url("../../images/dashboard/shape-1.svg");
+      content: url("../../images/dashboard/shape-1.svg");
     }
 
     .performance-overview-carousel .carousel-inner .item .icon.icon-b::before {
-    content: url("../../images/dashboard/shape-1.svg");
+      content: url("../../images/dashboard/shape-1.svg");
     }
 
     .performance-overview-carousel .carousel-inner .item .icon.icon-c::before {
-    content: url("../../images/dashboard/shape-3.svg");
+      content: url("../../images/dashboard/shape-3.svg");
     }
 
     .card.table-darkBGImg {
-    background: #1E283D url("../../images/dashboard/darkBG.png") repeat-y right top;
+      background: #1E283D url("../../images/dashboard/darkBG.png") repeat-y right top;
     }
 
     .data-icon-card-primary .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-secondary .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-success .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-info .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-warning .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-danger .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
     .data-icon-card-light .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
 
 
     .data-icon-card-dark .background-icon::before {
-    content: url("../../images/dashboard/shape-4.svg");
-    position: absolute;
+      content: url("../../images/dashboard/shape-4.svg");
+      position: absolute;
     }
+
     .auth .login-half-bg {
-    background: url("../../images/auth/login-bg.jpg");
-    background-size: cover;
+      background: url("../../images/auth/login-bg.jpg");
+      background-size: cover;
     }
 
     .auth .register-half-bg {
-    background: url("../../images/auth/register-bg.jpg");
-    background-size: cover;
+      background: url("../../images/auth/register-bg.jpg");
+      background-size: cover;
     }
 
     .auth.lock-full-bg {
-    background: url("../../images/auth/lockscreen-bg.jpg");
-    background-size: cover;
+      background: url("../../images/auth/lockscreen-bg.jpg");
+      background-size: cover;
     }
+
     table {
       width: 92%;
       background: rgba(255, 255, 255, 0.564);
-      border-radius: 10px;
+      border: 10px solid rgba(10, 91, 213, 0.86);
+
 
     }
 
@@ -106,14 +152,15 @@
     }
 
     td {
-      border: 1px solid rgb(204, 200, 200);
+
       text-align: left;
       padding: 8px 15px;
     }
 
     tr:nth-child(even),
     table.list thread>tr {
-      background-color: rgb(253, 248, 248);
+      background-color: rgb(246, 248, 250);
+      color: rgb(0, 0, 0);
     }
 
     input[type="text"],
@@ -167,7 +214,7 @@
   </style>
 </head>
 
-<body>
+<body onload="loadData();">
 
   </div>
   <!-- partial:partials/_navbar.html -->
@@ -179,10 +226,10 @@
         </button>
       </div>
       <div>
-        <a class="navbar-brand brand-logo" href="/dashboard">
+        <a class="navbar-brand brand-logo" href="/dashboard/{{ user_id }}/{{ user_name }}">
           <h1>PETA</h1>
         </a>
-        <a class="navbar-brand brand-logo-mini" href="/dashboard">
+        <a class="navbar-brand brand-logo-mini" href="/dashboard/{{ user_id }}/{{ user_name }}">
           <img src="{{url_for('static', filename='images/Logo.png')}}" alt="logo" />
         </a>
       </div>
@@ -194,32 +241,6 @@
         </li>
       </ul>
       <ul class="navbar-nav ms-auto">
-        <!-- <li class="nav-item dropdown d-none d-lg-block">
-          <a class="nav-link dropdown-bordered dropdown-toggle dropdown-toggle-split" id="messageDropdown" href="#"
-            data-bs-toggle="dropdown" aria-expanded="false"> Select Category </a>
-          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-            aria-labelledby="messageDropdown">
-            <a class="dropdown-item py-3">
-              <p class="mb-0 font-weight-medium float-left">Select category</p>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a class="dropdown-item preview-item">
-              <div class="preview-item-content flex-grow py-2">
-                <p class="preview-subject ellipsis font-weight-medium text-dark">Bootstrap Bundle </p>
-                <p class="fw-light small-text mb-0">This is a Bundle featuring 16 unique dashboards</p>
-              </div>
-            </a>
-
-          </div>
-        </li> -->
-        <li class="nav-item d-none d-lg-block">
-          <div id="datepicker-popup" class="input-group date datepicker navbar-date-picker">
-            <span class="input-group-addon input-group-prepend border-right">
-              <span class="icon-calendar input-group-text calendar-icon"></span>
-            </span>
-            <input type="text" class="form-control">
-          </div>
-        </li>
         <li class="nav-item dropdown">
           <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -227,32 +248,25 @@
             <span class="count"></span>
           </a>
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-            aria-labelledby="countDropdown">
-            <a class="dropdown-item py-3">
-              <p class="mb-0 font-weight-medium float-left">You have 7 unread mails </p>
-              <span class="badge badge-pill badge-primary float-right">View all</span>
-            </a>
+            aria-labelledby="countDropdown" id="notifDropDown">
             <div class="dropdown-divider"></div>
           </div>
         </li>
         <li class="nav-item dropdown d-none d-lg-block user-dropdown">
           <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-            <img class="img-xs rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image"> </a>
+            <img class="img-xs rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}"
+              alt="Profile image"> </a>
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
             <div class="dropdown-header text-center">
-              <img class="img-md rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image">
-              <p class="mb-1 mt-3 font-weight-semibold">Allen Moreno</p>
-              <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
+              <img class="img-md rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}"
+                alt="Profile image">
+              <p class="mb-1 mt-3 font-weight-semibold">{{ user_name }}</p>
             </div>
-            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My
-              Profile <span class="badge badge-pill badge-danger">1</span></a>
-            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>
-              Messages</a>
-            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i>
-              Activity</a>
-            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
-              FAQ</a>
-            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+            <a class="dropdown-item" href="/customerSupport/{{ user_id }}/{{ user_name }}"><i
+                class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+              CUSTOMER SUPPORT</a>
+            <a class="dropdown-item" href="/"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign
+              Out</a>
           </div>
         </li>
       </ul>
@@ -292,128 +306,32 @@
     <!-- partial:partials/_sidebar.html -->
     <nav class="sidebar sidebar-offcanvas" id="sidebar">
       <ul class="nav">
+
         <li class="nav-item">
-          <a class="nav-link" href="/dashboard">
+          <a class="nav-link" href="/dashboard/{{ user_id }}/{{ user_name }}">
             <i class="mdi mdi-grid-large menu-icon"></i>
             <span class="menu-title">Dashboard</span>
           </a>
         </li>
+        <br><br>
         <li class="nav-item">
-          <a class="nav-link" href="/manageAccounts">
-            <i class="mdi mdi-account-box-outline"></i>
+          <a class="nav-link" href="/manageAccounts/{{ user_id }}/{{ user_name }}">
+            <i class="mdi mdi-grid-large menu-icon"></i>
             <span class="menu-title">Manage Accounts</span>
           </a>
         </li>
+        <br><br>
         <li class="nav-item">
-          <a class="nav-link" href="/manageTransactions">
-            <i class="mdi mdi-account-box-outline"></i>
-            <span class="menu-title">Manage Expenses</span>
+          <a class="nav-link" href="/manageTransactions/{{ user_id }}/{{ user_name }}">
+            <i class="mdi mdi-grid-large menu-icon"></i>
+            <span class="menu-title">Manage Transactions</span>
           </a>
         </li>
+        <br><br>
         <li class="nav-item">
-          <a class="nav-link" href="../template/pages/tables/basic-table3.html">
-            <i class="mdi mdi-account-box-outline"></i>
-            <span class="menu-title">Manage</span>
-          </a>
-        </li>
-
-        </li>
-        <li class="nav-item nav-category">Manage Accounts</li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-            <i class="menu-icon mdi mdi-floor-plan"></i>
-            <span class="menu-title">UI Elements</span>
-            <i class="menu-arrow"></i>
-          </a>
-
-        </li>
-
-        <li class="nav-item nav-category">UI Elements</li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
-            <i class="menu-icon mdi mdi-floor-plan"></i>
-            <span class="menu-title">UI Elements</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="ui-basic">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"> <a class="nav-link" href="pages/ui-features/buttons.html">Buttons</a>
-              </li>
-              <li class="nav-item"> <a class="nav-link" href="pages/ui-features/dropdowns.html">Dropdowns</a></li>
-              <li class="nav-item"> <a class="nav-link" href="pages/ui-features/typography.html">Typography</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item nav-category">Forms and Datas</li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#form-elements" aria-expanded="false"
-            aria-controls="form-elements">
-            <i class="menu-icon mdi mdi-card-text-outline"></i>
-            <span class="menu-title">Form elements</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="form-elements">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"><a class="nav-link" href="pages/forms/basic_elements.html">Basic
-                  Elements</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#charts" aria-expanded="false" aria-controls="charts">
-            <i class="menu-icon mdi mdi-chart-line"></i>
-            <span class="menu-title">Charts</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="charts">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"> <a class="nav-link" href="pages/charts/chartjs.html">ChartJs</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
-            <i class="menu-icon mdi mdi-table"></i>
-            <span class="menu-title">Tables</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="tables">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"> <a class="nav-link" href="pages/tables/basic-table.html">Basic
-                  table</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
-            <i class="menu-icon mdi mdi-layers-outline"></i>
-            <span class="menu-title">Icons</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="icons">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"> <a class="nav-link" href="pages/icons/mdi.html">Mdi icons</a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item nav-category">pages</li>
-        <li class="nav-item">
-          <a class="nav-link" data-bs-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
-            <i class="menu-icon mdi mdi-account-circle-outline"></i>
-            <span class="menu-title">User Pages</span>
-            <i class="menu-arrow"></i>
-          </a>
-          <div class="collapse" id="auth">
-            <ul class="nav flex-column sub-menu">
-              <li class="nav-item"> <a class="nav-link" href="pages/samples/login.html"> Login </a></li>
-            </ul>
-          </div>
-        </li>
-        <li class="nav-item nav-category">help</li>
-        <li class="nav-item">
-          <a class="nav-link" href="http://bootstrapdash.com/demo/star-admin2-free/docs/documentation.html">
-            <i class="menu-icon mdi mdi-file-document"></i>
-            <span class="menu-title">Documentation</span>
+          <a class="nav-link" href="/customerSupport/{{ user_id }}/{{ user_name }}">
+            <i class="mdi mdi-grid-large menu-icon"></i>
+            <span class="menu-title">Customer Support</span>
           </a>
         </li>
       </ul>
@@ -433,21 +351,12 @@
               <td>
                 <form autocomplete="off" onsubmit="onFormSubmit()">
                   <div>
-                    <label for="productCode">&nbsp; Product Code</label>
-                    <input type="text" name="productCode" id="productCode">
+                    <label for="holdersName">Holder's Name</label>
+                    <input type="text" name="holdersName" id="holdersName">
                   </div>
                   <div>
-                    <label for="product">Product Name</label>
-                    <input type="text" name="product" id="product">
-                  </div>
-                  <div>
-                    <label for="qty">Qty</label><br>
-                    <input type="number" name="qty" id="qty">
-                  </div>
-
-                  <div>
-                    <label for="perPrice">Price</label><br>
-                    <input type="number" name="perPrice" id="perPrice">
+                    <label for="accountNo">Account No.</label><br>
+                    <input type="number" name="accountNo" id="accountNo">
                   </div>
 
                   <div class="form_action--button">
@@ -460,11 +369,10 @@
                 <table class="list" id="storeList">
                   <thead>
                     <tr>
-                      <th>&nbsp;Product Code</th>
-                      <th>Product Name</th>
-                      <th>Qty</th>
-                      <th>Price</th>
-                      <th></th>
+                      <th>&nbsp;Account ID</th>
+                      <th>Holder's Name</th>
+                      <th>Account No.</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -481,10 +389,10 @@
             function onFormSubmit(e) {
               event.preventDefault();
               var formData = readFormData();
+              // alert(selectedRow);
+              // alert(formData);
               if (selectedRow == null) {
                 insertNewRecord(formData);
-              } else {
-                updateRecord(formData);
               }
               resetForm();
             }
@@ -492,50 +400,46 @@
             //Retrieve the data
             function readFormData() {
               var formData = {};
-              formData["productCode"] = document.getElementById("productCode").value;
-              formData["product"] = document.getElementById("product").value;
-              formData["qty"] = document.getElementById("qty").value;
-              formData["perPrice"] = document.getElementById("perPrice").value;
+              formData["holdersName"] = document.getElementById("holdersName").value;
+              formData["accountNo"] = document.getElementById("accountNo").value;
               return formData;
             }
 
             //Insert the data
-            function insertNewRecord(data) {
+            async function insertNewRecord(data) {
               var table = document.getElementById("storeList").getElementsByTagName('tbody')[0];
               var newRow = table.insertRow(table.length);
               cell1 = newRow.insertCell(0);
-              cell1.innerHTML = data.productCode;
+              cell1.innerHTML = "Pending";
               cell2 = newRow.insertCell(1);
-              cell2.innerHTML = data.product;
+              cell2.innerHTML = data.holdersName;
               cell3 = newRow.insertCell(2);
-              cell3.innerHTML = data.qty;
+              cell3.innerHTML = data.accountNo;
               cell4 = newRow.insertCell(3);
-              cell4.innerHTML = data.perPrice;
-              cell4 = newRow.insertCell(4);
               cell4.innerHTML =
-                `<button onClick="onEdit(this)">Edit</button> <button onClick="onDelete(this)">Delete</button>`;
-            }
-
-            //Edit the data
-            function onEdit(td) {
-              selectedRow = td.parentElement.parentElement;
-              document.getElementById("productCode").value = selectedRow.cells[0].innerHTML;
-              document.getElementById("product").value = selectedRow.cells[1].innerHTML;
-              document.getElementById("qty").value = selectedRow.cells[2].innerHTML;
-              document.getElementById("perPrice").value = selectedRow.cells[3].innerHTML;
-            }
-
-            function updateRecord(formData) {
-              selectedRow.cells[0].innerHTML = formData.productCode;
-              selectedRow.cells[1].innerHTML = formData.product;
-              selectedRow.cells[2].innerHTML = formData.qty;
-              selectedRow.cells[3].innerHTML = formData.perPrice;
+                `<button onClick="onDelete(this)">Delete</button>`;
+              let myBody = '{"add_account_user_id":"{{ user_id }}","add_account_holders_name":"' + data.holdersName + '","add_account_acc_num":"' + data.accountNo + '"}'
+              const response = await fetch('/addFinancialAccount', {
+                method: 'POST',
+                body: myBody, // string or object
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
             }
 
             //Delete the data
-            function onDelete(td) {
+            async function onDelete(td) {
               if (confirm('Do you want to delete this record?')) {
                 row = td.parentElement.parentElement;
+                let myBody = '{"delete_financial_account_user_id":"{{ user_id }}","delete_financial_account_id":"' + row.cells[0].innerHTML + '"}'
+                const response = await fetch('/deleteFinancialAccount', {
+                  method: 'POST',
+                  body: myBody, // string or object
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                });
                 document.getElementById('storeList').deleteRow(row.rowIndex);
                 resetForm();
               }
@@ -543,10 +447,9 @@
 
             //Reset the data
             function resetForm() {
-              document.getElementById("productCode").value = '';
-              document.getElementById("product").value = '';
-              document.getElementById("qty").value = '';
-              document.getElementById("perPrice").value = '';
+              document.getElementById("accountId").value = '';
+              document.getElementById("holdersName").value = '';
+              document.getElementById("accountNo").value = '';
               selectedRow = null;
             }
           </script>

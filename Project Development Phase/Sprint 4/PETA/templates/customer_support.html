@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Manage Expenses</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/feather/feather.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/mdi/css/materialdesignicons.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/typicons/typicons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/simple-line-icons/css/simple-line-icons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/css/vendor.bundle.base.css')}}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <link rel="stylesheet"
+        href="{{url_for('static', filename='vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='js/select.dataTables.min.css')}}">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/style-1.css')}}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.png')}}" />
+    <script>
+        async function loadData() {
+            const response_notif = await fetch('/viewNotifications', {
+                method: 'POST',
+                body: '{"view_notification_user_id":"{{ user_id }}"}', // string or object
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            let notif_html_code = "";
+            const datas_notif = await response_notif.json(); //extract JSON from the http response
+            datas_notif.forEach(element => {
+                notif_html_code += `<a class="dropdown-item py-3">`;
+                notif_html_code += `<H6><b>` + element.HEADING + `</b> - </H6>`;
+                notif_html_code += `<H6>` + element.BODY_TEXT + `</H6>`;
+                notif_html_code += `</a>`;
+            });
+            document.getElementById("notifDropDown").innerHTML = notif_html_code;
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        #contact {
+            background-color: rgba(246, 246, 246, 0.86);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .contact-box {
+            width: clamp(100px, 90%, 1000px);
+            margin: 80px 50px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .contact-links,
+        .contact-form-wrapper {
+            width: 50%;
+            padding: 8% 5% 10% 5%;
+        }
+
+
+        .contact-links {
+            background-color: rgba(10, 91, 213, 0.86);
+            background:
+                radial-gradient(circle at 55% 92%, rgba(10, 91, 213, 0.86) 0 12%, transparent 12.2%),
+                radial-gradient(circle at 94% 72%, rgba(10, 91, 213, 0.86) 0 10%, transparent 10.2%),
+                radial-gradient(circle at 20% max(78%, 350px), rgba(10, 91, 213, 0.86) 0 7%, transparent 7.2%),
+                radial-gradient(circle at 0% 0%, rgba(10, 91, 213, 0.86) 0 40%, transparent 40.2%),
+                rgba(10, 91, 213, 0.86);
+            border-radius: 10px 0 0 10px;
+        }
+
+        .contact-form-wrapper {
+            background-color: #fdfbfb8f;
+            border-radius: 0 10px 10px 0;
+        }
+
+        @media only screen and (max-width: 800px) {
+
+            .contact-links,
+            .contact-form-wrapper {
+                width: 100%;
+            }
+
+            .contact-links {
+                border-radius: 10px 10px 0 0;
+            }
+
+            .contact-form-wrapper {
+                border-radius: 0 0 10px 10px;
+            }
+        }
+
+        @media only screen and (max-width: 400px) {
+            .contact-box {
+                width: 95%;
+                margin: 8% 5%;
+            }
+        }
+
+        h3 {
+            color: #fff;
+            font-size: clamp(30px, 6vw, 60px);
+            letter-spacing: 2px;
+            text-align: center;
+            transform: scale(.95, 1);
+        }
+
+        h5 {
+            color: rgb(9, 9, 9);
+            font-size: 20px;
+            letter-spacing: 2px;
+            text-align: center;
+            transform: scale(.95, 1);
+
+        }
+
+        .links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding-top: 50px;
+        }
+
+        .link {
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        img {
+            width: 45px;
+            height: 45px;
+            filter:
+                hue-rotate(220deg) drop-shadow(2px 4px 4px #0006);
+            transition: 0.2s;
+            user-select: none;
+        }
+
+        img:hover {
+            transform: scale(1.1, 1.1);
+        }
+
+        img:active {
+            transform: scale(1.1, 1.1);
+            filter:
+                hue-rotate(220deg) drop-shadow(2px 4px 4px #222) sepia(0.3);
+        }
+
+        .form-item {
+            position: relative;
+        }
+
+        label,
+        input,
+        textarea {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        label {
+            position: absolute;
+            top: 10px;
+            left: 2%;
+            color: #999;
+            font-size: clamp(14px, 1.5vw, 18px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            outline: 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            padding: 12px;
+            font-size: clamp(15px, 1.5vw, 18px);
+        }
+
+        input:focus+label,
+        input:valid+label,
+        textarea:focus+label,
+        textarea:valid+label {
+            font-size: clamp(13px, 1.3vw, 16px);
+            color: #777;
+            top: -20px;
+            transition: all .225s ease;
+        }
+
+        .submit-btn {
+            background-color: rgba(10, 91, 213, 0.86);
+            filter: drop-shadow(2px 2px 3px #0003);
+            color: #fff;
+            font-family: "Poppins", sans-serif;
+            font-size: clamp(16px, 1.6vw, 18px);
+            display: block;
+            padding: 12px 20px;
+            margin: 2px auto;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+            transition: 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.1, 1.1);
+        }
+
+        .submit-btn:active {
+            transform: scale(1.1, 1.1);
+            filter: sepia(0.5);
+        }
+
+        @media only screen and (max-width: 800px) {
+            h2 {
+                font-size: clamp(40px, 10vw, 60px);
+            }
+        }
+
+        @media only screen and (max-width: 400px) {
+            h2 {
+                font-size: clamp(30px, 12vw, 60px);
+            }
+
+            .links {
+                padding-top: 30px;
+            }
+
+            img {
+                width: 38px;
+                height: 38px;
+            }
+        }
+    </style>
+</head>
+
+<body onload="loadData()">
+    <div class="container-scroller">
+
+    </div>
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+            <div class="me-3">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+            <div>
+                <a class="navbar-brand brand-logo" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                    <h1>PETA</h1>
+                </a>
+                <a class="navbar-brand brand-logo-mini" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                    <img src="images/logo-mini.svg" alt="logo" />
+                </a>
+            </div>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-top">
+            <ul class="navbar-nav">
+                <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
+                    <h1 class="welcome-text">Welcome Back, <span class="text-black fw-bold">Trackers</span></h1>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="icon-bell"></i>
+                        <span class="count"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
+                        aria-labelledby="countDropdown" id="notifDropDown">
+                        <div class="dropdown-divider"></div>
+                    </div>
+                </li>
+                <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+                    <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="img-xs rounded-circle"
+                            src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image"> </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+                        <div class="dropdown-header text-center">
+                            <img class="img-md rounded-circle"
+                                src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image">
+                            <p class="mb-1 mt-3 font-weight-semibold">{{ user_name }}</p>
+                        </div>
+                        <a class="dropdown-item" href="/customerSupport/{{ user_id }}/{{ user_name }}"><i
+                                class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+                            CUSTOMER SUPPORT</a>
+                        <a class="dropdown-item" href="/"><i
+                                class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_settings-panel.html -->
+
+
+        <!-- partial -->
+        <!-- partial:partials/_sidebar.html -->
+        <br><br>
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/manageAccounts/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Manage Accounts</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/manageTransactions/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Manage Transactions</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/customerSupport/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Customer Support</span>
+                    </a>
+                </li>
+
+
+
+
+
+            </ul>
+        </nav>
+        <div class="col-lg-11 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title box2">Customer Support</h4>
+                    <div>
+                        {{ msg }}
+                    </div>
+
+                    <section id="contact">
+                        <div class="contact-box">
+                            <div class="contact-links">
+                                <h3>Contact Us</h3>
+                                <div class="links">
+                                    <div class="link">
+                                        <a href="mailto:care.team.peta@gmail.com"><img
+                                                src="https://i.postimg.cc/NjLfyjPB/email.png" alt="email"></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="contact-form-wrapper">
+                                <form action="/storeReport" method="POST">
+                                    <h5>Give Your Feedback</h5>
+                                    <div>
+                                        <input type="text" name="report_user_id" id="report_user_id"
+                                            value="{{ user_id }}" style="visibility: hidden">
+                                    </div>
+                                    <div class="form-item">
+                                        <input type="text" name="report_title" id="report_title" required>
+                                        <label>Title:</label>
+                                    </div>
+                                    <div class="form-item">
+                                        <textarea class="" name="report_text" id="report_text" required></textarea>
+                                        <label>Message:</label>
+                                    </div>
+                                    <button class="submit-btn" value="submit">Send</button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                    <script>
+                        $('.form__btn').click(function () {
+                            $('.mail__letter').toggleClass('move');
+                            $('.mail__top').toggleClass('closed');
+                            $('.form__btn--invisible').toggleClass('visible');
+                            $('.form__btn--visible').toggleClass('invisible');
+                        });
+
+                        $('input').focus(function () {
+                            $(this).parent().addClass('active');
+                            $('input').focusout(function () {
+                                if ($(this).val() == '') {
+                                    $(this).parent().removeClass('active');
+                                } else {
+                                    $(this).parent().addClass('active');
+                                }
+                            })
+                        });
+                    </script>
+                    <!-- endinject -->
+                    <!-- Custom js for this page-->
+                    <!-- End custom js for this page-->
+</body>
+
+</html>

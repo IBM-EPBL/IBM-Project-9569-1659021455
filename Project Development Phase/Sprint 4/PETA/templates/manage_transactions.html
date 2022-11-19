@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Personel Expense Live Tracker </title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/feather/feather.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/mdi/css/materialdesignicons.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/ti-icons/css/themify-icons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/typicons/typicons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/simple-line-icons/css/simple-line-icons.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='vendors/css/vendor.bundle.base.css')}}">
+    <!-- endinject -->
+    <!-- Plugin css for this page -->
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="{{url_for('static', filename='styles/style-1.css')}}">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="{{url_for('static', filename='images/favicon.png')}}" />
+
+    <script>
+        async function loadData() {
+            const response_notif = await fetch('/viewNotifications', {
+                method: 'POST',
+                body: '{"view_notification_user_id":"{{ user_id }}"}', // string or object
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            });
+            let notif_html_code = "";
+            const datas_notif = await response_notif.json(); //extract JSON from the http response
+            datas_notif.forEach(element=>{
+                notif_html_code += `<a class="dropdown-item py-3">`;
+                notif_html_code += `<H6><b>`+ element.HEADING +`</b> - </H6>`;
+                notif_html_code += `<H6>`+ element.BODY_TEXT +`</H6>`;
+                notif_html_code += `</a>`;
+            });
+            document.getElementById("notifDropDown").innerHTML = notif_html_code;
+            const response_acc = await fetch('/viewFinancialAccount', {
+                method: 'POST',
+                body: '{"view_financial_account_user_id":"{{ user_id }}"}', // string or object
+                headers: {
+                'Content-Type': 'application/json'
+                }
+            });
+            const datas_acc = await response_acc.json(); //extract JSON from the http response
+            let html_code = `<label for="accountSelection">&nbsp;Account Selection</label><br><select class="select2" name="accountSelection" id="accountSelection" onChange = "loadExpenseData()">`;
+            datas_acc.forEach(element => {
+                html_code += `<option value="` + element.ACC_ID + `">`+ element.ACCOUNT_NO + ` - ` + element.HOLDERS_NAME +`</option>`;
+            })
+            html_code += `</select><br>`;
+            document.getElementById("accountsDropDown").innerHTML = html_code;
+            loadExpenseData(datas_acc[0].ACC_ID)
+        }
+        async function loadExpenseData() {
+            document.getElementById("storeList").innerHTML = "<thead><tr><th>Exp ID</th><th>Exp Type</th><th>Exp Sub Type</th><th>Amount</th><th>Date</th><th>Actions</th></tr></thead><tbody></tbody>"
+            var table = document.getElementById("storeList").getElementsByTagName('tbody')[0];
+            let acc_id = document.getElementById("accountSelection").value;
+            const response = await fetch('/viewExpenses', {
+                method: 'POST',
+                body: '{"view_expenses_user_id":"{{ user_id }}","view_expenses_account_id":"' + acc_id + '"}', // string or object
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            const datas = await response.json(); //extract JSON from the http response
+            // var table = document.getElementById("storeList").getElementsByTagName('tbody')[0];
+            datas.forEach(data => {
+                var newRow = table.insertRow(table.length);
+                cell1 = newRow.insertCell(0);
+                cell1.innerHTML = data.EXP_ID;
+                cell1 = newRow.insertCell(1);
+                cell1.innerHTML = data.EXP_TYPE;
+                cell2 = newRow.insertCell(2);
+                cell2.innerHTML = data.SUB_TYPE;
+                cell3 = newRow.insertCell(3);
+                cell3.innerHTML = data.AMOUNT;
+                cell4 = newRow.insertCell(4);
+                cell4.innerHTML = data.ADDED_DATE;
+                cell5 = newRow.insertCell(5);
+                cell5.innerHTML =
+                    `<button onClick="onEdit(this)">Edit</button> <button onClick="onDelete(this)">Delete</button>`;
+            });
+        }
+    </script>
+
+    <style>
+        .performance-overview-carousel .carousel-inner .item .icon.icon-a::before {
+            content: url("../../images/dashboard/shape-1.svg");
+        }
+
+        .performance-overview-carousel .carousel-inner .item .icon.icon-b::before {
+            content: url("../../images/dashboard/shape-1.svg");
+        }
+
+        .performance-overview-carousel .carousel-inner .item .icon.icon-c::before {
+            content: url("../../images/dashboard/shape-3.svg");
+        }
+
+        .card.table-darkBGImg {
+            background: #1E283D url("../../images/dashboard/darkBG.png") repeat-y right top;
+        }
+
+        .data-icon-card-primary .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-secondary .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-success .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-info .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-warning .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-danger .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .data-icon-card-light .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+
+        .data-icon-card-dark .background-icon::before {
+            content: url("../../images/dashboard/shape-4.svg");
+            position: absolute;
+        }
+
+        .auth .login-half-bg {
+            background: url("../../images/auth/login-bg.jpg");
+            background-size: cover;
+        }
+
+        .auth .register-half-bg {
+            background: url("../../images/auth/register-bg.jpg");
+            background-size: cover;
+        }
+
+        .auth.lock-full-bg {
+            background: url("../../images/auth/lockscreen-bg.jpg");
+            background-size: cover;
+        }
+
+        table {
+            width: 92%;
+            background: rgba(255, 255, 255, 0.564);
+            border: 10px solid rgba(10, 91, 213, 0.86);
+
+
+        }
+
+        table.list {
+            color: white;
+            background-color: rgba(10, 91, 213, 0.86);
+            text-align: center;
+            width: 100%;
+        }
+
+        td {
+
+            text-align: left;
+            padding: 8px 15px;
+        }
+
+        tr:nth-child(even),
+        table.list thread>tr {
+            background-color: rgb(246, 248, 250);
+            color: rgb(0, 0, 0);
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 91%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid rgb(165, 161, 161);
+            border-radius: 4px;
+        }
+
+        input[type="submit"],
+        input[type="reset"] {
+            background: rgba(10, 91, 213, 0.86);
+            padding: 6px 12px;
+            margin: 15px 0 10px;
+            display: inline-block;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            color: #eee;
+            cursor: pointer;
+            outline: none;
+        }
+
+        input[type="submit"]:hover {
+            background: #4b99d8;
+        }
+
+        input[type="reset"]:hover {
+            background: #4b99d8;
+        }
+
+        button {
+            background: #eee;
+            padding: 6px 12px;
+            margin: 15px 0 10px;
+            display: inline-block;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+        }
+
+        button:hover {
+            background: rgba(10, 91, 213, 0.86);
+            color: white;
+        }
+
+        select {
+            width: 91%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid rgb(165, 161, 161);
+            border-radius: 4px;
+        }
+
+        .select2 {
+            width: 27%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid rgb(165, 161, 161);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body onload="loadData()">
+
+    </div>
+    <!-- partial:partials/_navbar.html -->
+    <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+        <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+            <div class="me-3">
+                <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+                    <span class="icon-menu"></span>
+                </button>
+            </div>
+            <div>
+                <a class="navbar-brand brand-logo" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                    <h1>PETA</h1>
+                </a>
+                <a class="navbar-brand brand-logo-mini" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                    <img src="{{url_for('static', filename='images/Logo.png')}}" alt="logo" />
+                </a>
+            </div>
+        </div>
+        <div class="navbar-menu-wrapper d-flex align-items-top">
+            <ul class="navbar-nav">
+                <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
+                    <h1 class="welcome-text">Welcome Back, <span class="text-black fw-bold">Trackers</span></h1>
+                </li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="icon-bell"></i>
+                        <span class="count"></span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
+                        aria-labelledby="countDropdown" id="notifDropDown">
+                        <div class="dropdown-divider"></div>
+                    </div>
+                </li>
+                <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+                  <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img class="img-xs rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image"> </a>
+                  <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+                    <div class="dropdown-header text-center">
+                      <img class="img-md rounded-circle" src="{{url_for('static', filename='images/faces/face8.jpg')}}" alt="Profile image">
+                      <p class="mb-1 mt-3 font-weight-semibold">{{ user_name }}</p>
+                    </div>
+                    <a class="dropdown-item" href="/customerSupport/{{ user_id }}/{{ user_name }}"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>
+                      CUSTOMER SUPPORT</a>
+                    <a class="dropdown-item" href="/"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                  </div>
+                </li>
+            </ul>
+            <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+                data-bs-toggle="offcanvas">
+                <span class="mdi mdi-menu"></span>
+            </button>
+        </div>
+    </nav>
+    <!-- partial -->
+    <div class="container-fluid page-body-wrapper">
+        <!-- partial:partials/_settings-panel.html -->
+        <div class="theme-setting-wrapper">
+            <div id="settings-trigger"><i class="ti-settings"></i></div>
+            <div id="theme-settings" class="settings-panel">
+                <i class="settings-close ti-close"></i>
+                <p class="settings-heading">SIDEBAR SKINS</p>
+                <div class="sidebar-bg-options selected" id="sidebar-light-theme">
+                    <div class="img-ss rounded-circle bg-light border me-3"></div>Light
+                </div>
+                <div class="sidebar-bg-options" id="sidebar-dark-theme">
+                    <div class="img-ss rounded-circle bg-dark border me-3"></div>Dark
+                </div>
+                <p class="settings-heading mt-2">HEADER SKINS</p>
+                <div class="color-tiles mx-0 px-4">
+                    <div class="tiles success"></div>
+                    <div class="tiles warning"></div>
+                    <div class="tiles danger"></div>
+                    <div class="tiles info"></div>
+                    <div class="tiles dark"></div>
+                    <div class="tiles default"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- partial -->
+        <!-- partial:partials/_sidebar.html -->
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            <ul class="nav">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/dashboard/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Dashboard</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/manageAccounts/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Manage Accounts</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/manageTransactions/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Manage Transactions</span>
+                    </a>
+                </li>
+                <br><br>
+                <li class="nav-item">
+                    <a class="nav-link" href="/customerSupport/{{ user_id }}/{{ user_name }}">
+                        <i class="mdi mdi-grid-large menu-icon"></i>
+                        <span class="menu-title">Customer Support</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+
+
+        <div class="col-lg-11 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title box2">Manage Transactions</h4>
+                    <br>
+                    <div id="accountsDropDown"></div>
+
+
+                    <table>
+                        <tr>
+                            <td>
+                                <form autocomplete="off" onsubmit="onFormSubmit()">
+                                    <div id="expIdDiv" style="visibility: hidden;">
+                                        <!-- document.getElementById('expIdDiv').style.visibility = 'visible' -->
+                                        <label for="expId">Exp ID</label>
+                                        <input type="text" name="expId" id="expId" value="0" readonly="readonly">
+                                    </div>
+                                    <div>
+                                        <label for="expType">&nbsp; Exp Type</label><br>
+                                        <select name="expType" id="expType">
+                                            <option value="Income">Income</option>
+                                            <option value="Expense" selected="true">Expense</option>
+                                        </select><br>
+                                    </div>
+                                    <!-- <div>
+                                        <label for="expType">Exp Type</label>
+                                        <input type="text" name="expType" id="expType">
+                                    </div> -->
+                                    <div>
+                                        <label for="expSubType">&nbsp; Exp Type</label><br>
+                                        <select name="expSubType" id="expSubType">
+                                            <option value="Food">Food</option>
+                                            <option value="Fuel" selected="true">Fuel</option>
+                                            <option value="Entertainment" selected="true">Entertainment</option>
+                                            <option value="Other Expenses" selected="true">Other Expenses</option>
+                                        </select><br>
+                                    </div>
+                                    <!-- <div>
+                                        <label for="expSubType">Exp Sub Type</label><br>
+                                        <input type="text" name="expSubType" id="expSubType">
+                                    </div> -->
+
+                                    <div>
+                                        <label for="amount">Amount</label><br>
+                                        <input type="number" name="amount" id="amount">
+                                    </div>
+
+                                    <div>
+                                        <label for="date">Date</label><br>
+                                        <input type="text" name="date" id="date">
+                                    </div>
+
+                                    <div class="form_action--button">
+                                        <input type="submit" value="Submit">
+                                        <input type="reset" value="Reset">
+                                    </div>
+                                </form>
+
+                            <td>
+                                <table class="list" id="storeList">
+                                    <thead>
+                                        <tr>
+                                            <th>Exp ID</th>
+                                            <th>Exp Type</th>
+                                            <th>Exp Sub Type</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    </tbody>
+                                </table>
+                            </td>
+                            </td>
+                        </tr>
+                    </table>
+                    <script>
+                        var selectedRow = null
+
+                        function onFormSubmit(e) {
+                            event.preventDefault();
+                            var formData = readFormData();
+                            if (selectedRow == null) {
+                                insertNewRecord(formData);
+                            } else {
+                                updateRecord(formData);
+                            }
+                            resetForm();
+                        }
+
+                        //Retrieve the data
+                        function readFormData() {
+                            var formData = {};
+                            formData["expId"] = document.getElementById("expId").value;
+                            formData["expType"] = document.getElementById("expType").value;
+                            formData["expSubType"] = document.getElementById("expSubType").value;
+                            formData["amount"] = document.getElementById("amount").value;
+                            formData["date"] = document.getElementById("date").value;
+                            return formData;
+                        }
+
+                        //Insert the data
+                        async function insertNewRecord(data) {
+                            var table = document.getElementById("storeList").getElementsByTagName('tbody')[0];
+                            var newRow = table.insertRow(table.length);
+                            cell1 = newRow.insertCell(0);
+                            cell1.innerHTML = "Pending";
+                            cell2 = newRow.insertCell(1);
+                            cell2.innerHTML = data.expType;
+                            cell3 = newRow.insertCell(2);
+                            cell3.innerHTML = data.expSubType;
+                            cell4 = newRow.insertCell(3);
+                            cell4.innerHTML = data.amount;
+                            cell5 = newRow.insertCell(4);
+                            cell5.innerHTML = data.date;
+                            cell6 = newRow.insertCell(5);
+                            cell6.innerHTML =
+                                `<button onClick="onEdit(this)">Edit</button> <button onClick="onDelete(this)">Delete</button>`;
+                            let myBody = '{"add_expense_user_id":"{{ user_id }}","add_expense_acc_id":"' + document.getElementById("accountSelection").value + '","add_expense_type":"' + data.expType + '","add_expense_sub_type":"' + data.expSubType + '","add_expense_amount":"' + data.amount + '","add_expense_date":"' + data.date + '"}'
+                            const response = await fetch('/addExpenses', {
+                                method: 'POST',
+                                body: myBody, // string or object
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                        }
+
+                        //Edit the data
+                        function onEdit(td) {
+                            selectedRow = td.parentElement.parentElement;
+                            document.getElementById('expIdDiv').style.visibility = 'visible'
+                            document.getElementById("expId").value = selectedRow.cells[0].innerHTML;
+                            document.getElementById("expType").value = selectedRow.cells[1].innerHTML;
+                            document.getElementById("expSubType").value = selectedRow.cells[2].innerHTML;
+                            document.getElementById("amount").value = selectedRow.cells[3].innerHTML;
+                            document.getElementById("date").value = selectedRow.cells[4].innerHTML;
+                        }
+
+                        async function updateRecord(formData) {
+                            selectedRow.cells[0].innerHTML = formData.expId;
+                            selectedRow.cells[1].innerHTML = formData.expType;
+                            selectedRow.cells[2].innerHTML = formData.expSubType;
+                            selectedRow.cells[3].innerHTML = formData.amount;
+                            selectedRow.cells[4].innerHTML = formData.date;
+                            let myBody = '{"update_expense_user_id":"{{ user_id }}","update_expense_acc_id":"' + document.getElementById("accountSelection").value + '","update_expense_id":"' + formData.expId + '","update_expense_type":"' + formData.expType + '","update_expense_sub_type":"' + formData.expSubType + '","update_expense_amount":"' + formData.amount + '","update_expense_date":"' + formData.date + '"}'
+                            alert(myBody);
+                            const response = await fetch('/updateExpense', {
+                                method: 'POST',
+                                body: myBody, // string or object
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+                            document.getElementById('expIdDiv').style.visibility = 'hidden';
+                        }
+
+                        //Delete the data
+                        async function onDelete(td) {
+                            if (confirm('Do you want to delete this record?')) {
+                                row = td.parentElement.parentElement;
+                                let myBody = '{"delete_expense_user_id":"{{ user_id }}","delete_expense_acc_id":"' + document.getElementById("accountSelection").value + '","delete_expense_id":"' + row.cells[0].innerHTML + '"}'
+                                const response = await fetch('/deleteExpense', {
+                                    method: 'POST',
+                                    body: myBody, // string or object
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    }
+                                });
+                                document.getElementById('storeList').deleteRow(row.rowIndex);
+                                resetForm();
+                            }
+                        }
+
+                        //Reset the data
+                        function resetForm() {
+                            document.getElementById("expIdDiv").style.visibility = "hidden";
+                            document.getElementById("expId").value = '0';
+                            document.getElementById("expType").value = 'Expenses';
+                            document.getElementById("expSubType").value = '';
+                            document.getElementById("amount").value = '';
+                            document.getElementById("date").value = '';
+                            selectedRow = null;
+                        }
+                    </script>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- content-wrapper ends -->
+    <!-- partial:../../partials/_footer.html -->
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Premium <a
+                    href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from
+                BootstrapDash.</span>
+            <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Copyright © 2021. All rights
+                reserved.</span>
+        </div>
+    </footer>
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+    </div>
+    <!-- page-body-wrapper ends -->
+    </div>
+    <!-- container-scroller -->
+    <!-- plugins:js -->
+    <script src="{{url_for('static', filename='vendors/js/vendor.bundle.base.js')}}"></script>
+    <!-- endinject -->
+    <!-- Plugin js for this page -->
+    <script src="{{url_for('static', filename='vendors/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
+    <!-- End plugin js for this page -->
+    <!-- inject:js -->
+    <script src="{{url_for('static', filename='js/off-canvas.js')}}"></script>
+    <script src="{{url_for('static', filename='js/hoverable-collapse.js')}}"></script>
+    <script src="{{url_for('static', filename='js/template.js')}}"></script>
+    <script src="{{url_for('static', filename='js/settings.js')}}"></script>
+    <script src="{{url_for('static', filename='js/todolist.js')}}"></script>
+    <script>
+        $ = function (id) {
+            return document.getElementById(id);
+        }
+
+        var show = function (id) {
+            $(id).style.display = 'block';
+        }
+        var hide = function (id) {
+            $(id).style.display = 'none';
+        }
+    </script>
+    <!-- endinject -->
+    <!-- Custom js for this page-->
+    <!-- End custom js for this page-->
+</body>
+
+</html>

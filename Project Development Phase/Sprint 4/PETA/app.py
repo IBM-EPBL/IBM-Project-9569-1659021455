@@ -4,6 +4,7 @@ from flask_restful import Api, Resource, reqparse, abort
 from datetime import date, datetime, timedelta
 from flask_mail import Mail, Message
 from flask_db2 import DB2
+import json
 
 import ibm_db
 
@@ -78,7 +79,10 @@ def addAccount():
     while account != False:
         id = account.get("ID")
         account = ibm_db.fetch_assoc(stmt)
-    id = id + 1
+    if id:
+        id = id + 1
+    else:
+        id = 1
 
     # if account:
     #   return render_template('list.html', msg="You are already a member, please login using your details")
@@ -121,37 +125,42 @@ def loginAccount():
     account = ibm_db.fetch_assoc(stmt)
 
     check = 0
+    id = 0
+    name = ""
     while account != False:
         id = account.get("ID")
+        name = account.get("NAME")
         password_db = account.get("PASSWORD")
         if password == password_db:
             check = 1
             print("Success")
         account = ibm_db.fetch_assoc(stmt)
     
-    if check == 1:
+    if check == 1 and id > 0 and name:
         print( "Login successfull..")
-        return render_template('homepage.html')
+        return render_template('homepage.html', user_id = id, user_name = name)
     print( "Login failed..")
     return "Login Failed!"
 
-@app.route('/dashboard',methods = ['POST', 'GET'])
-def dashboard():
-    return render_template('dashboard_main.html')
+@app.route('/dashboard/<user_idv>/<user_namev>',methods = ['POST', 'GET'])
+def dashboard(user_idv, user_namev):
+    return render_template('dashboard_main.html', user_id = user_idv, user_name = user_namev)
 
 # ---------------------------------- FINANCIAL ACCOUNTS ----------------------------------
 
-@app.route('/manageAccounts',methods = ['POST', 'GET'])
-def manageAccounts():
-    return render_template('basic-table.html')
+@app.route('/manageAccounts/<user_idv>/<user_namev>',methods = ['POST', 'GET'])
+def manageAccounts(user_idv, user_namev):
+    return render_template('manage_accounts.html', user_id = user_idv, user_name = user_namev)
 
 @app.route('/addFinancialAccount',methods = ['POST', 'GET'])
 def addFinancialAccount():
   if request.method == 'POST':
 
-    user_id = request.form['add_account_user_id']
-    holders_name = request.form['add_account_holders_name']
-    account_no = request.form['add_account_acc_num']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['add_account_user_id']
+    holders_name = request_data['add_account_holders_name']
+    account_no = request_data['add_account_acc_num']
     # acc_id user_id holders_name account_no is_active
 
     sql = "SELECT * FROM financial_account order by acc_id desc limit 1"
@@ -161,9 +170,12 @@ def addFinancialAccount():
     
     id = 0
     while financial_account != False:
-        id = financial_account.get("acc_id")
+        id = financial_account.get("ACC_ID")
         financial_account = ibm_db.fetch_assoc(stmt)
-    id = id + 1
+    if id:
+        id = id + 1
+    else:
+        id = 1
 
     insert_sql = "INSERT INTO financial_account VALUES (?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, insert_sql)
@@ -176,13 +188,15 @@ def addFinancialAccount():
     
     print( "Financial Account Data saved successfuly..")
     # return render_template('manageExpenses.html')
-    return render_template('index.html')
+    return "Success! Financial Account Data saved successfuly."
 
 @app.route('/viewFinancialAccount',methods = ['POST', 'GET'])
 def viewFinancialAccount():
   if request.method == 'POST':
 
-    user_id = request.form['view_financial_account_user_id']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['view_financial_account_user_id']
 
     sql = "SELECT * FROM financial_account WHERE user_id = ? AND is_active = 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -196,14 +210,19 @@ def viewFinancialAccount():
         financial_account = ibm_db.fetch_assoc(stmt)
 
     print(financial_accounts);
-    return financial_account;
+    if len(financial_accounts) > 0:
+        return financial_accounts
+    else:
+        return []
 
 @app.route('/deleteFinancialAccount',methods = ['POST', 'GET'])
 def deleteFinancialAccount():
   if request.method == 'POST':
 
-    user_id = request.form['delete_financial_account_user_id']
-    acc_id = request.form['delete_financial_account_id']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['delete_financial_account_user_id']
+    acc_id = request_data['delete_financial_account_id']
 
     sql = "SELECT * FROM financial_account WHERE acc_id = ? AND user_id = ? AND is_active = 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -226,20 +245,22 @@ def deleteFinancialAccount():
 
 # ---------------------------------- EXPENSES ----------------------------------
 
-@app.route('/manageTransactions',methods = ['POST', 'GET'])
-def manageTransactions():
-    return render_template('basic-table2.html')
+@app.route('/manageTransactions/<user_idv>/<user_namev>',methods = ['POST', 'GET'])
+def manageTransactions(user_idv, user_namev):
+    return render_template('manage_transactions.html', user_id = user_idv, user_name = user_namev)
 
 @app.route('/addExpenses',methods = ['POST', 'GET'])
 def addExpenses():
   if request.method == 'POST':
 
-    user_id = request.form['add_expense_user_id']
-    acc_id = request.form['add_expense_acc_id']
-    exp_type = request.form['add_expense_type']
-    sub_type = request.form['add_expense_sub_type']
-    amount = request.form['add_expense_amount']
-    date = request.form['add_expense_date']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['add_expense_user_id']
+    acc_id = request_data['add_expense_acc_id']
+    exp_type = request_data['add_expense_type']
+    sub_type = request_data['add_expense_sub_type']
+    amount = request_data['add_expense_amount']
+    date = request_data['add_expense_date']
     # exp_id user_id acc_id exp_type sub_type amount added_date is_active
 
     sql = "SELECT * FROM expenses order by exp_id desc limit 1"
@@ -249,9 +270,12 @@ def addExpenses():
     
     id = 0
     while expenses != False:
-        id = expenses.get("exp_id")
+        id = expenses.get("EXP_ID")
         expenses = ibm_db.fetch_assoc(stmt)
-    id = id + 1
+    if id:
+        id = id + 1
+    else:
+        id = 1
 
     insert_sql = "INSERT INTO expenses VALUES (?,?,?,?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, insert_sql)
@@ -272,7 +296,7 @@ def addExpenses():
         start_date = first_day_of_month()
         last_date = last_day_of_month()
 
-        sql_sum = "SELECT * FROM expenses WHERE user_id = ? AND exp_type = ? AND sub_type = ? AND added_date BETWEEN(?,?) AND is_active = 1"
+        sql_sum = "SELECT * FROM expenses WHERE user_id = ? AND exp_type = ? AND sub_type = ? AND added_date BETWEEN ? AND ? AND is_active = 1"
         stmt_sum = ibm_db.prepare(conn, sql_sum)
         ibm_db.bind_param(stmt_sum,1,user_id)
         ibm_db.bind_param(stmt_sum,2,exp_type)
@@ -284,7 +308,7 @@ def addExpenses():
         
         total_sum = 0
         while expenses_sum != False:
-            total_sum += int(expenses_sum.get("amount"))
+            total_sum += int(expenses_sum.get("AMOUNT"))
             expenses_sum = ibm_db.fetch_assoc(stmt_sum)
         
         print("total_sum: " + str(total_sum))
@@ -299,7 +323,7 @@ def addExpenses():
 
         conf_amount = 92233720368547000
         while expenses_conf != False:
-            conf_amount = int(expenses_conf.get("amount"))
+            conf_amount = int(expenses_conf.get("AMOUNT"))
             expenses_conf = ibm_db.fetch_assoc(stmt_sum)
 
         print("conf_amount: " + str(conf_amount))
@@ -314,9 +338,12 @@ def addExpenses():
 
             notif_id = 0
             while notif_id_result != False:
-                notif_id = expenses.get("notif_id")
+                notif_id = expenses.get("NOTIF_ID")
                 notif_id_result = ibm_db.fetch_assoc(stmt_notif_id)
-            notif_id = notif_id + 1
+            if notif_id:
+                notif_id = notif_id + 1
+            else:
+                notif_id = 1
 
             today = date.today()
             today = today.strftime("%d-%m-%Y")
@@ -343,9 +370,11 @@ def addExpenses():
 @app.route('/viewExpenses',methods = ['POST', 'GET'])
 def viewExpenses():
   if request.method == 'POST':
+    
+    request_data = json.loads(request.data.decode())
 
-    user_id = request.form['view_expenses_user_id']
-    acc_id = request.form['view_expenses_account_id']
+    user_id = request_data['view_expenses_user_id']
+    acc_id = request_data['view_expenses_account_id']
 
     sql = "SELECT * FROM expenses WHERE user_id = ? AND acc_id = ? AND is_active = 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -360,19 +389,24 @@ def viewExpenses():
         expenses = ibm_db.fetch_assoc(stmt)
 
     print("expenses_list: " + str(expenses_list));
-    return expenses_list;
+    if len(expenses_list) > 0:
+        return expenses_list
+    else:
+        return []
 
 @app.route('/updateExpense',methods = ['POST', 'GET'])
 def updateExpense():
   if request.method == 'POST':
 
-    user_id = request.form['update_expense_user_id']
-    exp_id = request.form['update_expense_id']
-    acc_id = request.form['add_expense_acc_id']
-    exp_type = request.form['add_expense_type']
-    sub_type = request.form['add_expense_sub_type']
-    amount = request.form['add_expense_amount']
-    date = request.form['add_expense_date']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['update_expense_user_id']
+    exp_id = request_data['update_expense_id']
+    acc_id = request_data['update_expense_acc_id']
+    exp_type = request_data['update_expense_type']
+    sub_type = request_data['update_expense_sub_type']
+    amount = request_data['update_expense_amount']
+    date_var = request_data['update_expense_date']
 
     sql = "SELECT * FROM expenses WHERE user_id = ? AND exp_id = ? AND is_active = 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -382,13 +416,13 @@ def updateExpense():
     expenses = ibm_db.fetch_assoc(stmt)
 
     while expenses != False:
-        update_sql = "UPDATE expenses SET acc_id = ?, exp_type = ?, sub_type = ?, amount = ?, date = ? WHERE user_id = ? AND exp_id = ? AND is_active = 1"
+        update_sql = "UPDATE expenses SET acc_id = ?, exp_type = ?, sub_type = ?, amount = ?, added_date = ? WHERE user_id = ? AND exp_id = ? AND is_active = 1"
         prep_stmt = ibm_db.prepare(conn, update_sql)
         ibm_db.bind_param(prep_stmt, 1, acc_id)
         ibm_db.bind_param(prep_stmt, 2, exp_type)
         ibm_db.bind_param(prep_stmt, 3, sub_type)
         ibm_db.bind_param(prep_stmt, 4, amount)
-        ibm_db.bind_param(prep_stmt, 5, date)
+        ibm_db.bind_param(prep_stmt, 5, date_var)
         ibm_db.bind_param(prep_stmt, 6, user_id)
         ibm_db.bind_param(prep_stmt, 7, exp_id)
         ibm_db.execute(prep_stmt)
@@ -401,7 +435,7 @@ def updateExpense():
         start_date = first_day_of_month()
         last_date = last_day_of_month()
 
-        sql_sum = "SELECT * FROM expenses WHERE user_id = ? AND exp_type = ? AND sub_type = ? AND added_date BETWEEN(?,?) AND is_active = 1"
+        sql_sum = "SELECT * FROM expenses WHERE user_id = ? AND exp_type = ? AND sub_type = ? AND added_date BETWEEN ? AND ? AND is_active = 1"
         stmt_sum = ibm_db.prepare(conn, sql_sum)
         ibm_db.bind_param(stmt_sum,1,user_id)
         ibm_db.bind_param(stmt_sum,2,exp_type)
@@ -413,7 +447,7 @@ def updateExpense():
         
         total_sum = 0
         while expenses_sum != False:
-            total_sum += int(expenses_sum.get("amount"))
+            total_sum += int(expenses_sum.get("AMOUNT"))
             expenses_sum = ibm_db.fetch_assoc(stmt_sum)
         
         print("total_sum: " + str(total_sum))
@@ -428,7 +462,7 @@ def updateExpense():
 
         conf_amount = 92233720368547000
         while expenses_conf != False:
-            conf_amount = int(expenses_conf.get("amount"))
+            conf_amount = int(expenses_conf.get("AMOUNT"))
             expenses_conf = ibm_db.fetch_assoc(stmt_sum)
 
         print("conf_amount: " + str(conf_amount))
@@ -443,9 +477,12 @@ def updateExpense():
 
             notif_id = 0
             while notif_id_result != False:
-                notif_id = expenses.get("notif_id")
+                notif_id = expenses.get("NOTIF_ID")
                 notif_id_result = ibm_db.fetch_assoc(stmt_notif_id)
-            notif_id = notif_id + 1
+            if notif_id:
+                notif_id = notif_id + 1
+            else:
+                notif_id = 1
             
             today = date.today()
             today = today.strftime("%d-%m-%Y")
@@ -472,10 +509,12 @@ def updateExpense():
 @app.route('/deleteExpense',methods = ['POST', 'GET'])
 def deleteExpense():
   if request.method == 'POST':
+    
+    request_data = json.loads(request.data.decode())
 
-    user_id = request.form['delete_expense_user_id']
-    acc_id = request.form['delete_expense_acc_id']
-    exp_id = request.form['delete_expense_id']
+    user_id = request_data['delete_expense_user_id']
+    acc_id = request_data['delete_expense_acc_id']
+    exp_id = request_data['delete_expense_id']
 
     sql = "SELECT * FROM expenses WHERE user_id = ? AND acc_id = ? AND exp_id = ? AND is_active = 1"
     stmt = ibm_db.prepare(conn, sql)
@@ -510,9 +549,12 @@ def insertConfigurations(user_id, conf_type, conf_name, amount, date):
     
     id = 0
     while configuration != False:
-        id = configuration.get("conf_id")
+        id = configuration.get("CONF_ID")
         configuration = ibm_db.fetch_assoc(stmt)
-    id = id + 1
+    if id:
+        id = id + 1
+    else:
+        id = 1
 
     insert_sql = "INSERT INTO configurations VALUES (?,?,?,?,?,?,?)"
     prep_stmt = ibm_db.prepare(conn, insert_sql)
@@ -623,7 +665,9 @@ def deleteConfiguration():
 def viewNotifications():
   if request.method == 'POST':
 
-    user_id = request.form['view_notification_user_id']
+    request_data = json.loads(request.data.decode())
+
+    user_id = request_data['view_notification_user_id']
 
     sql = "SELECT * FROM notifications WHERE user_id = ? AND is_active = 1 ORDER BY notif_id desc"
     stmt = ibm_db.prepare(conn, sql)
@@ -637,9 +681,16 @@ def viewNotifications():
         notifications = ibm_db.fetch_assoc(stmt)
 
     print("notification_list: " + str(notification_list));
-    return notification_list;
+    if len(notification_list) > 0:
+        return notification_list
+    else:
+        return []
 
 # ---------------------------------- CUSTOMER SUPPORT ----------------------------------
+
+@app.route('/customerSupport/<user_idv>/<user_namev>',methods = ['POST', 'GET'])
+def customerSupport(user_idv, user_namev):
+    return render_template('customer_support.html', user_id = user_idv, user_name = user_namev)
 
 @app.route('/storeReport',methods = ['POST', 'GET'])
 def storeReport():
@@ -657,7 +708,7 @@ def storeReport():
     
     user_name = ""
     while user_name_result != False:
-        user_name.replace(user_name_result.get("name"))
+        user_name = str(user_name_result.get("name"))
         user_name_result = ibm_db.fetch_assoc(stmt_user)
     
     sql = "SELECT * FROM reports order by report_id desc limit 1"
@@ -667,9 +718,12 @@ def storeReport():
     
     id = 0
     while reports != False:
-        id = reports.get("report_id")
+        id = reports.get("REPORT_ID")
         reports = ibm_db.fetch_assoc(stmt)
-    id = id + 1
+    if id:
+        id = id + 1
+    else:
+        id = 1
     
     today = date.today()
     today = today.strftime("%d-%m-%Y")
@@ -690,20 +744,20 @@ def storeReport():
 
     # to Be mailed
     
-    app.config['MAIL_SERVER']='smtp.gmail.com'
-    app.config['MAIL_PORT'] = 465
-    app.config['MAIL_USERNAME'] = 'care.team.peta@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'vlxngbyimeqkvphw'
-    app.config['MAIL_USE_TLS'] = False
-    app.config['MAIL_USE_SSL'] = True
-    mail = Mail(app)
+    # app.config['MAIL_SERVER']='smtp.gmail.com'
+    # app.config['MAIL_PORT'] = 465
+    # app.config['MAIL_USERNAME'] = 'care.team.peta@gmail.com'
+    # app.config['MAIL_PASSWORD'] = 'peta@123'
+    # app.config['MAIL_USE_TLS'] = False
+    # app.config['MAIL_USE_SSL'] = True
+    # mail = Mail(app)
 
-    msg = Message(("Concern: " + title), sender = 'care.team.peta@gmail.com', recipients = ['care.team.peta@gmail.com'])
-    msg.body = ("Dear PETA Support Team, I am " + user_name + " - " + user_id + ", a PETA Application user. I have the following concern: " + report_text + " Waiting for your quick reply. Thanks & Regards " + user_name + " - " + user_id)
-    mail.send(msg)
-    print("Mail Sent")
+    # msg = Message(("Concern: " + title), sender = 'care.team.peta@gmail.com', recipients = ['care.team.peta@gmail.com'])
+    # msg.body = ("Dear PETA Support Team, I am " + user_name + " - " + user_id + ", a PETA Application user. I have the following concern: " + report_text + " Waiting for your quick reply. Thanks & Regards " + user_name + " - " + user_id)
+    # mail.send(msg)
+    # print("Mail Sent")
     # return render_template('manageExpenses.html')
-    return "Report stored successfully and Mail Sent to Team!";
+    return render_template('customer_support.html', user_id = user_id, user_name = user_name, msg = "Report stored successfully!")
 
 @app.route('/viewReports',methods = ['POST', 'GET'])
 def viewReports():
