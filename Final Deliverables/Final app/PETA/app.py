@@ -67,7 +67,7 @@ def addAccount():
     name = request.form['reg-name']
     email = request.form['reg-email']
     password = request.form['reg-password']
-    predictable_monthly_income = request.form['reg-monthly-income']
+    predictable_monthly_income = 50000
 
     sql = "SELECT * FROM account order by id desc limit 1"
     stmt = ibm_db.prepare(conn, sql)
