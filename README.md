@@ -6,8 +6,8 @@
 
 ## 🧑🏻‍🦰 TEAM MEMBERS
 Team leader: Anish Chamaria <br>
-Team member1: Anvitha G B H S<br>
-Team member2: Bavithra R S<br>
+Team member1: Anvitha G B H <br>
+Team member2: Bavithra R <br>
 Team member3: Dakshin S<br>
 <hr>
 
